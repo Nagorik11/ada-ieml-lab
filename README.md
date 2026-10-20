@@ -7,7 +7,7 @@ Laboratorio semiótico experimental con análisis de glifos, roles gramaticales,
 - Glifos Ingress: tokenización, clasificación experimental C/L/A/D, entropía de Shannon y grafo sintagmático.
 - Lenguaje natural: identificación heurística de raíz + ocho roles; análisis opcional con spaCy y FastAPI.
 - Alineación candidata IEML: diccionario curado con registros de procedencia, no generación automática de USL.
-- **Alfabeto 5 × 5 (nuevo):** 25 símbolos con etiquetas bilingües, coordenadas U/A/S/B/T, vectores gráficos 6D y comparación coseno.
+- **Alfabeto 5 × 5:** 25 abreviaturas verificadas contra la tabla oficial del código upstream, etiquetas bilingües y vectores gráficos 6D **experimentales** para comparación coseno.
 - **Biblioteca de investigación (nuevo):** documentación local con procedencia, búsqueda y aviso de modelos experimentales.
 - **Explorador de referencia (nuevo):** búsqueda EN/FR en datos IEML v0.4, si el backend y el JSON están disponibles.
 
