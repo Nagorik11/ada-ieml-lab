@@ -7,6 +7,7 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+from backend.ieml_bridge import align_roles
 import spacy
 
 MODEL = "es_core_news_sm"
@@ -22,6 +23,10 @@ PLACE = {"en", "desde", "hacia", "dentro", "sobre", "junto"}
 PURPOSE = {"para", "a fin de"}
 CAUSE = {"por", "mediante", "debido", "gracias"}
 MANNER = {"rápidamente", "lentamente", "cuidadosamente"}
+
+class AlignmentRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=15000)
+    validate: bool = False
 
 class Request(BaseModel):
     text: str = Field(min_length=1, max_length=15000)
@@ -93,3 +98,7 @@ def health():
 @app.post("/api/analyze")
 def analyze(request: Request):
     return extract(request.text)
+
+@app.post("/api/align")
+def align(request: AlignmentRequest):
+    return align_roles(extract(request.text), validate=request.validate)
