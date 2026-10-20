@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ADA · IEML Semiotic Lab</title>
+<style>
+:root{font-family:system-ui,Arial;color:#edf3ff;background:#0b1321}*{box-sizing:border-box}body{margin:0}header,footer{padding:24px 5%;background:#101e32}h1{margin:0}small,.muted{color:#a5bad6}main{max-width:1200px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:#14243b;border:1px solid #304763;padding:20px;border-radius:14px}.wide{grid-column:1/-1}textarea{width:100%;min-height:105px;padding:12px;background:#091626;color:#fff;border:1px solid #526d89;border-radius:8px;font:inherit}button{border:0;border-radius:8px;padding:11px 14px;background:#60ddba;color:#09231e;font-weight:bold;cursor:pointer;margin:6px 5px 0 0}button.alt{background:#334c67;color:white}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#091626;padding:12px;border-radius:9px}.stat strong{display:block;font-size:23px;color:#60ddba}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.chip{border:1px solid #55708c;border-radius:20px;padding:5px 9px;font-size:12px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #304763;padding:9px;text-align:left;font-size:13px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#091626;padding:12px}svg{width:100%;height:210px;background:#091626;border-radius:10px}footer{text-align:center;color:#a5bad6}@media(max-width:750px){main{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>◈ ADA / IEML Semiotic Lab</h1><small>Gramática · Semiótica · Roles actanciales · Familias de glifos · JSON</small></header>
+<main>
+<section class="panel"><h2>01 / Expresión</h2><textarea id="expression">clear → mind → avoid → restraint → refresh → body → begin</textarea><div><button id="analyze">Analizar</button><button class="alt" id="example">Ejemplo</button><button class="alt" id="export">Exportar JSON</button></div><p class="muted">Admite flechas, comas, &gt; y espacios.</p><div class="chips" id="chips"></div></section>
+<section class="panel"><h2>02 / Métricas</h2><div class="stats"><div class="stat"><small>Tokens</small><strong id="count"></strong></div><div class="stat"><small>Reconocidos</small><strong id="known"></strong></div><div class="stat"><small>Entropía</small><strong id="entropy"></strong></div></div><p id="dominant"></p><div class="chips" id="distribution"></div></section>
+<section class="panel wide"><h2>03 / Grafo sintagmático</h2><svg id="graph" viewBox="0 0 1100 210" role="img" aria-label="Grafo de secuencia de signos"></svg></section>
+<section class="panel"><h2>04 / Signos y roles</h2><div style="overflow:auto"><table><thead><tr><th>Glifo</th><th>Familia</th><th>Rol</th><th>Significado</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section class="panel"><h2>05 / Lectura semiótica</h2><p id="reading"></p><div id="transitions"></div><small>Clasificación y roles heurísticos: no equivalen a análisis IEML formal.</small></section>
+<section class="panel wide"><h2>06 / Datos</h2><pre id="json"></pre></section>
+</main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
+<script>
+"use strict";
+const entries=[
+["CLEAR","D","Despeje","Initiator"],["MIND","C","Mente","Recipient"],["AVOID","D","Evitación","Causality"],["RESTRAINT","D","Contención","Recipient"],["REFRESH","L","Renovación","Initiator"],["BODY","L","Cuerpo","Interactant"],["BEGIN","C","Inicio","Root"],
+["SEE","C","Percepción","Recipient"],["HAVE","L","Posesión","Recipient"],["PATH","L","Trayectoria","Root"],["NEUTRALIZE","D","Negación","Causality"],["SEEK","A","Búsqueda","Initiator"],["SIMPLE","D","Claridad","Causality"],["MODIFY","A","Transformación","Causality"],["TRUEDATA","C","Verdad","Root"],["SHAPERS","C","Agencia externa","Initiator"],["NZEER","D","Agencia externa","Initiator"],["OUTSIDE","A","Exterioridad","Root"],["GAIN","L","Adquisición","Recipient"],["EVOLUTION","L","Evolución","Root"],["TECH","A","Tecnología","Interactant"],["UNBOUNDED","A","Apertura","Root"],["LEGACY","D","Herencia","Root"],["XM","C","Materia exótica","Interactant"],["USE","L","Uso","Interactant"],["SELF","C","Identidad","Recipient"],["NOT_INSIDE","D","Exterioridad","Causality"],["EASY","L","Facilidad","Causality"],["PURITY","C","Purificación","Causality"],["ABANDON","D","Renuncia","Causality"],["CREATE","C","Creación","Initiator"],["DESTROY","A","Destrucción","Causality"],["CHANGE","A","Cambio","Causality"],["DEATH","D","Cese","Root"],["BREATHE_LIVE","L","Vitalidad","Initiator"],["BARRIER","D","Límite","Causality"]];
+const catalog=Object.fromEntries(entries.map(([name,family,sign,role])=>[name,{family,sign,role}]));
+const $=id=>document.getElementById(id);let result;
+function element(tag,content,parent){const e=document.createElement(tag);e.textContent=content;parent.appendChild(e);return e;}
+function analyze(){
+ const names=$("expression").value.trim().toUpperCase().split(/\s*(?:→|>|,|\n)\s*|\s+/).filter(Boolean);
+ const tokens=names.map((name,index)=>({index:index+1,name,...(catalog[name]||{family:"?",sign:"Desconocido",role:"Unmapped"})}));
+ const distribution={C:0,L:0,A:0,D:0};tokens.forEach(t=>{if(Object.hasOwn(distribution,t.family))distribution[t.family]++});
+ const known=Object.values(distribution).reduce((a,b)=>a+b,0);
+ const entropy=known?-Object.values(distribution).filter(Boolean).reduce((s,n)=>s+n/known*Math.log2(n/known),0):0;
+ const dominant=Object.entries(distribution).sort((a,b)=>b[1]-a[1])[0];
+ const transitions=tokens.slice(1).map((t,i)=>({from:tokens[i].name,to:t.name,relation:tokens[i].family===t.family?"continuidad de familia":"cambio de familia"}));
+ result={schema:"ada-ieml-lab/v1",method:"heuristic-experimental",expression:names.join(" → "),tokens,distribution,familyEntropyBits:Number(entropy.toFixed(4)),transitions};
+ $("count").textContent=tokens.length;$("known").textContent=known;$("entropy").textContent=entropy.toFixed(3);
+ $("dominant").textContent=known?`Familia predominante: ${dominant[0]} (${dominant[1]}/${known}). Entropía de Shannon de familias, NO entropía DMN.`:"No hay glifos reconocidos.";
+ const chips=$("chips");chips.replaceChildren();tokens.forEach(t=>element("span",t.name+" · "+t.family,chips).className="chip");
+ const distr=$("distribution");distr.replaceChildren();Object.entries(distribution).forEach(([k,n])=>element("span",k+": "+n,distr).className="chip");
+ const rows=$("rows");rows.replaceChildren();tokens.forEach(t=>{const tr=document.createElement("tr");[t.name,t.family,t.role,t.sign].forEach(s=>element("td",s,tr));rows.appendChild(tr);});
+ $("reading").textContent=known?`Se reconocieron ${known} signos. Predomina ${dominant[0]} con ${Math.round(100*dominant[1]/known)}%. Se observan ${transitions.filter(x=>x.relation==="cambio de familia").length} cambios de familia. Los roles son hipótesis semióticas, no una gramática IEML verificada.`:"Ingresa glifos del catálogo experimental.";
+ const list=$("transitions");list.replaceChildren();transitions.forEach(t=>element("p",t.from+" → "+t.to+": "+t.relation,list));
+ $("json").textContent=JSON.stringify(result,null,2);draw(tokens);
+}
+function draw(tokens){
+ const svg=$("graph");svg.replaceChildren();const ns="http://www.w3.org/2000/svg";function add(tag,attrs,txt){const e=document.createElementNS(ns,tag);for(const [k,v]of Object.entries(attrs))e.setAttribute(k,v);if(txt!==undefined)e.textContent=txt;svg.appendChild(e);}
+ const n=tokens.length;if(!n)return;const spacing=n>1?1040/(n-1):0;const radius=Math.min(17,n>1?spacing/3:17);
+ tokens.forEach((t,i)=>{const x=30+i*spacing;if(i)add("line",{x1:30+(i-1)*spacing+radius,y1:80,x2:x-radius,y2:80,stroke:"#6685a4","stroke-width":2});
+ add("circle",{cx:x,cy:80,r:radius,fill:({C:"#29c5b1",L:"#80b4ff",A:"#f6c66b",D:"#dc85aa"})[t.family]||"#63738a"});
+ add("text",{x,y:125,fill:"#e8f0ff","font-size":Math.max(8,Math.min(14,600/n)),"text-anchor":"middle"},t.name);
+ add("text",{x,y:150,fill:"#a9bdd3","font-size":11,"text-anchor":"middle"},t.family);
+ });
+}
+$("analyze").addEventListener("click",analyze);$("example").addEventListener("click",()=>{$("expression").value="seek → truedata → evolution → create";analyze()});
+$("export").addEventListener("click",()=>{if(!result)analyze();const url=URL.createObjectURL(new Blob([JSON.stringify(result,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="ada-ieml-analysis.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});analyze();
+</script></body></html>
