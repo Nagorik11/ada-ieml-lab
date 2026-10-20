@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.ieml_bridge import align_roles
 from backend.canonical_space import assign_roles as canonical_assign_roles, assign_analysis as canonical_assign_analysis
+from backend.lattice import LatticeStructure
 from backend.upstream_database import (
     DatabaseUnavailable, DatabaseQueryError,
     database_status as upstream_database_status,
@@ -21,7 +22,7 @@ from backend.upstream_ieml import (
     UpstreamInvalid, UpstreamUnavailable, availability as upstream_availability,
     parse_expression as upstream_parse_expression, role_addresses as upstream_role_addresses,
 )
-from backend.reference import lookup as reference_lookup, search as reference_search, neighbors as reference_neighbors
+from backend.reference import lookup as reference_lookup, search as reference_search, neighbors as reference_neighbors, reference as load_reference
 import spacy
 
 MODEL = "es_core_news_sm"
@@ -44,6 +45,15 @@ class AlignmentRequest(BaseModel):
 
 class Request(BaseModel):
     text: str = Field(min_length=1, max_length=15000)
+
+
+class LatticeEdgesRequest(BaseModel):
+    words: list[str] = Field(min_length=1, max_length=300)
+    edges: list[tuple[str, str, str]] = Field(default_factory=list, max_length=3000)
+
+
+class LatticeReferenceRequest(BaseModel):
+    terms: list[str] = Field(min_length=1, max_length=300)
 
 
 class UpstreamParseRequest(BaseModel):
@@ -289,4 +299,24 @@ def upstream_db_table(term: str):
     except DatabaseQueryError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+@app.post("/api/lattice/edges")
+def build_lattice_from_edges(request: LatticeEdgesRequest):
+    """Create a hierarchy from explicit typed relations, without IEML imports."""
+    try:
+        return LatticeStructure.from_edges(request.words, request.edges).to_dict()
+    except (ValueError, TypeError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/lattice/reference")
+def build_lattice_from_reference(request: LatticeReferenceRequest):
+    """Create an induced hierarchy from terms in imported IEML v0.4 JSON."""
+    try:
+        source_data = load_reference()
+        return LatticeStructure.from_reference(source_data, request.terms).to_dict()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except (ValueError, TypeError) as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
