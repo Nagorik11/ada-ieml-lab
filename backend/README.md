@@ -41,3 +41,9 @@ pip install -r backend/requirements-upstream-ieml.txt
 Para consultar el motor: `GET /api/upstream/status`, `GET /api/upstream/roles` y `POST /api/upstream/parse` con `{"kind":"script","expression":"wa."}`.
 
 **Importante:** el README upstream indica imports de `ieml.grammar`, pero la revisión auditada usa `ieml.usl.usl` y `ieml.dictionary.script`. Revisa [UPSTREAM_IEML.md](../docs/UPSTREAM_IEML.md) para compatibilidad, licencia y limitaciones.
+
+## Consultas IEMLDatabase (notebook aportado)
+
+Si instalas el paquete Python `IEMLdev/ieml` de manera opcional y clonas los datos `IEMLdev/ieml-language` mediante HTTPS, define `IEML_DATABASE_PATH` a esa carpeta. Los endpoints `GET /api/upstream/database/status`, `/terms`, `/descriptors`, `/relations` y `/table` permiten explorar su contenido **sin escribir ni hacer pull**.
+
+Ver [IEML_DATABASE_NOTEBOOK.md](../docs/IEML_DATABASE_NOTEBOOK.md) para configuración, ejemplos y advertencias de compatibilidad.
