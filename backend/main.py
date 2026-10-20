@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.ieml_bridge import align_roles
+from backend.reference import lookup as reference_lookup, search as reference_search, neighbors as reference_neighbors
 import spacy
 
 MODEL = "es_core_news_sm"
@@ -102,3 +103,32 @@ def analyze(request: Request):
 @app.post("/api/align")
 def align(request: AlignmentRequest):
     return align_roles(extract(request.text), validate=request.validate)
+
+@app.get("/api/reference/search")
+def search_reference(q: str, limit: int = 20, language: str | None = None):
+    from fastapi import HTTPException
+    try:
+        return {"results": reference_search(q, min(max(limit, 1), 100), language)}
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+@app.get("/api/reference/term")
+def get_reference_term(term: str):
+    from fastapi import HTTPException
+    try:
+        result = reference_lookup(term)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    if result is None:
+        raise HTTPException(status_code=404, detail="Term not in reference")
+    return result
+
+@app.get("/api/reference/neighbors")
+def get_reference_neighbors(term: str, limit: int = 50):
+    from fastapi import HTTPException
+    try:
+        return {"term": term, "edges": reference_neighbors(term, min(max(limit, 1), 100))}
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
