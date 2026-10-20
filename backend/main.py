@@ -9,6 +9,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.ieml_bridge import align_roles
 from backend.canonical_space import assign_roles as canonical_assign_roles, assign_analysis as canonical_assign_analysis
+from backend.upstream_database import (
+    DatabaseUnavailable, DatabaseQueryError,
+    database_status as upstream_database_status,
+    list_terms as upstream_database_list,
+    get_descriptors as upstream_database_descriptors,
+    get_relations as upstream_database_relations,
+)
 from backend.upstream_ieml import (
     UpstreamInvalid, UpstreamUnavailable, availability as upstream_availability,
     parse_expression as upstream_parse_expression, role_addresses as upstream_role_addresses,
@@ -214,6 +221,59 @@ def upstream_parse(request: UpstreamParseRequest):
     except UpstreamUnavailable as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except UpstreamInvalid as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+@app.get("/api/upstream/database/status")
+def upstream_db_status():
+    """Report local IEMLdev/ieml-language checkout readiness (no network)."""
+    return upstream_database_status()
+
+
+@app.get("/api/upstream/database/terms")
+def upstream_db_terms(
+    kind: Literal["morpheme", "polymorpheme", "lexeme", "word"] | None = None,
+    q: str | None = None,
+    limit: int = 25,
+    offset: int = 0,
+):
+    """List USLs from the local versioned database, without parsing them."""
+    try:
+        return upstream_database_list(kind, q, limit=limit, offset=offset)
+    except DatabaseUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except DatabaseQueryError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/upstream/database/descriptors")
+def upstream_db_descriptors(
+    term: str,
+    language: Literal["en", "fr"] | None = None,
+    category: Literal["translations", "tags", "comments", "rdf_repositories"] | None = None,
+):
+    """Look up exact published EN/FR labels, tags, and comments."""
+    try:
+        return upstream_database_descriptors(term, language=language, category=category)
+    except DatabaseUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except DatabaseQueryError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/upstream/database/relations")
+def upstream_db_relations(term: str, relation: str, limit: int = 30):
+    """Query one structural relation; optional and computationally expensive."""
+    try:
+        return upstream_database_relations(term, relation, limit=limit)
+    except DatabaseUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except DatabaseQueryError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
