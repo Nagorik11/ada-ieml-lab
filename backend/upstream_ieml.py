@@ -67,7 +67,8 @@ def availability() -> dict[str, Any]:
         "available": installed,
         "installedVersion": installed_version,
         "source": UPSTREAM_REPOSITORY,
-        "pinnedCommit": UPSTREAM_COMMIT,
+        "reviewedCommit": UPSTREAM_COMMIT,
+        "installedCommitVerified": False,
         "license": UPSTREAM_LICENSE,
         "parserTested": False,
         "warning": (
@@ -97,7 +98,7 @@ def role_addresses() -> dict[str, Any]:
     return {
         "schema": "ada-ieml-upstream-roles/v1",
         "source": UPSTREAM_ROLE_SOURCE,
-        "sourceCommit": UPSTREAM_COMMIT,
+        "reviewedCommit": UPSTREAM_COMMIT,
         "roleAddresses": records,
         "formalIEML": False,
         "warnings": [
@@ -122,10 +123,10 @@ def _parse_function(kind: str):
         if not callable(candidate):
             raise TypeError(f"{module}.{symbol} is not callable")
         return candidate
-    except (ImportError, AttributeError, TypeError, OSError) as exc:
+    except Exception as exc:
         raise UpstreamUnavailable(
             f"Upstream parser unavailable ({module}.{symbol}): "
-            f"{type(exc).__name__}: {exc}"
+            f"{type(exc).__name__}: {str(exc)[:200]}"
         ) from exc
 
 
@@ -160,7 +161,8 @@ def parse_expression(expression: str, kind: str = "script") -> dict[str, Any]:
         "canonical": str(parsed),
         "objectType": type(parsed).__name__,
         "source": UPSTREAM_REPOSITORY,
-        "sourceCommit": UPSTREAM_COMMIT,
+        "reviewedCommit": UPSTREAM_COMMIT,
+        "installedCommitVerified": False,
         "warning": (
             "Syntax accepted by the installed upstream parser does not prove "
             "that the expression is defined in a particular IEML dictionary "
