@@ -58,3 +58,14 @@ La sección **11 / Asignación de bases canónicas** utiliza las evidencias de r
 - `python3 -m unittest backend.test_canonical_space -v` verifica propiedades algebraicas.
 
 Véase [documentación de bases canónicas](docs/CANONICAL_BASIS.md). **Se trata de codificación estructural de roles y no de semántica USL certificada.**
+
+## Integración opcional con IEMLdev/ieml (GPL-3.0)
+
+La sección **12 / Parser IEML original** presenta las direcciones sintagmáticas asociadas a `e0…e8` y permite validar sintaxis con la biblioteca Python original, si se instala por separado. Esto no equivale a validar la semántica o pertenencia a un diccionario normativo.
+
+```bash
+pip install -r backend/requirements-upstream-ieml.txt
+python -m unittest backend.test_upstream_ieml -v
+```
+
+La biblioteca upstream es antigua (commit del 8 de marzo de 2021) y su ejecución con Python moderno sigue pendiente de prueba de integración real. **No se han copiado archivos con licencia GPL-3.0 al repositorio**, pero el uso y distribución combinados requieren revisar las obligaciones de esa licencia. Consultar [auditoría técnica y guía de integración](docs/UPSTREAM_IEML.md).
