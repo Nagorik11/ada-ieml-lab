@@ -24,6 +24,9 @@ El README original muestra `from ieml.grammar import usl`; ese módulo **no exis
 
 Por tanto, el adaptador usa `ieml.dictionary.script.script` o `ieml.usl.usl.usl`, **no** las rutas antiguas del README.
 
+## Comprobación del alfabeto 5×5
+Los 25 pares U/A/S/B/T ↔ abreviaturas `wo, wa, y, ... , l` de `src/ieml/alphabet.js` coinciden con `remarkable_multiplication_lookup_table` en `ieml/constants.py` del upstream auditado. El parser original reconoce además el primitivo `E` (vacío). La tabla de caracteres es una correspondencia del proyecto IEML; **los vectores gráficos de seis dimensiones, el coseno y las descripciones del modelo aportado no son parte de la implementación upstream**, sino una extensión experimental.
+
 ## Correspondencias con nuestra base canónica
 
 Fuente exacta: https://github.com/IEMLdev/ieml/blob/b49d70bc8a9a548bf6a1066eef8cb975cbf95c91/ieml/usl/constants.py
