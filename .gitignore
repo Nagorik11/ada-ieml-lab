@@ -1,0 +1,13 @@
+# Local historical IEML checkout; do not accidentally vendor external data.
+data/upstream-ieml-language/
+# Generated reference exports; regenerate from licensed input sources.
+data/ieml-v04/
+# Local Python environments and runtime.
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+# Secrets and overrides.
+.env
+.env.*
+!.env.example
