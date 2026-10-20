@@ -11,16 +11,29 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check HTML entrypoint
-        run: test -s index.html
-      - name: Check inline JavaScript syntax
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check HTML entrypoint and module mount
         run: |
-          node - <<'NODE'
+          test -s index.html
+          grep -q 'src/ieml/ui.js' index.html
+          grep -q 'id="alphabetBody"' index.html
+          grep -q 'id="iemlDocsResults"' index.html
+      - name: Check all inline JavaScript blocks
+        run: |
+          node --input-type=commonjs - <<'NODE'
           const fs = require('node:fs');
           const vm = require('node:vm');
-          const html = fs.readFileSync('index.html', 'utf8');
-          const match = html.match(/<script>([\s\S]*?)<\/script>/);
-          if (!match) throw Error('Missing inline JavaScript');
-          new vm.Script(match[1], {filename: 'index.html'});
-          console.log('Inline JavaScript syntax OK');
+          const html = fs.readFileSync('index.html','utf8');
+          const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)];
+          if(!scripts.length)throw Error('No inline scripts');
+          for(const [i,m] of scripts.entries())new vm.Script(m[1],{filename:'index.html:'+i});
+          console.log('Validated '+scripts.length+' inline scripts');
           NODE
+      - name: Check IEML modules
+        run: npm run check
+      - name: Run IEML JS unit tests
+        run: npm test
+      - name: Run Python reference and alignment tests
+        run: python -m unittest backend.test_reference backend.test_ieml_bridge -v
