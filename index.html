@@ -3,7 +3,7 @@
 <title>ADA · IEML Semiotic Lab</title>
 <style>
 :root{font-family:system-ui,Arial;color:#edf3ff;background:#0b1321}*{box-sizing:border-box}body{margin:0}header,footer{padding:24px 5%;background:#101e32}h1{margin:0}small,.muted{color:#a5bad6}main{max-width:1200px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:#14243b;border:1px solid #304763;padding:20px;border-radius:14px}.wide{grid-column:1/-1}textarea{width:100%;min-height:105px;padding:12px;background:#091626;color:#fff;border:1px solid #526d89;border-radius:8px;font:inherit}button{border:0;border-radius:8px;padding:11px 14px;background:#60ddba;color:#09231e;font-weight:bold;cursor:pointer;margin:6px 5px 0 0}button.alt{background:#334c67;color:white}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#091626;padding:12px;border-radius:9px}.stat strong{display:block;font-size:23px;color:#60ddba}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.chip{border:1px solid #55708c;border-radius:20px;padding:5px 9px;font-size:12px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #304763;padding:9px;text-align:left;font-size:13px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#091626;padding:12px}svg{width:100%;height:210px;background:#091626;border-radius:10px}footer{text-align:center;color:#a5bad6}@media(max-width:750px){main{grid-template-columns:1fr}}
-</style></head><body>
+.ieml-help{color:#a5bad6;font-size:13px;line-height:1.5}.ieml-table{overflow-x:auto}.ieml-table th{color:#b8d8ef}.alpha-cell{min-width:48px;margin:0;background:#203d54;color:#c9f6ee}.alpha-cell[aria-pressed="true"]{background:#60ddba;color:#09231e;outline:2px solid #edf3ff}.ieml-doc{border:1px solid #304763;padding:12px 14px;border-radius:10px;margin-top:10px}.ieml-doc h3{margin:0 0 8px}.ieml-doc p{font-size:14px;line-height:1.6}.ieml-field{background:#091626;color:white;border:1px solid #526d89;border-radius:8px;padding:10px;max-width:100%;width:100%;font:inherit}#alphabetSelected{font-size:19px;color:#60ddba;font-weight:700}#alphaComparison{display:block;margin-top:8px}pre{max-height:420px;overflow:auto}</style></head><body>
 <header><h1>◈ ADA / IEML Semiotic Lab</h1><small>Gramática · Semiótica · Roles actanciales · Familias de glifos · JSON</small></header>
 <main>
 <section class="panel"><h2>01 / Expresión</h2><textarea id="expression">clear → mind → avoid → restraint → refresh → body → begin</textarea><div><button id="analyze">Analizar</button><button class="alt" id="example">Ejemplo</button><button class="alt" id="export">Exportar JSON</button></div><p class="muted">Admite flechas, comas, &gt; y espacios.</p><div class="chips" id="chips"></div></section>
@@ -12,7 +12,47 @@
 <section class="panel"><h2>04 / Signos y roles</h2><div style="overflow:auto"><table><thead><tr><th>Glifo</th><th>Familia</th><th>Rol</th><th>Significado</th></tr></thead><tbody id="rows"></tbody></table></div></section>
 <section class="panel"><h2>05 / Lectura semiótica</h2><p id="reading"></p><div id="transitions"></div><small>Clasificación y roles heurísticos: no equivalen a análisis IEML formal.</small></section>
 <section class="panel wide"><h2>06 / Datos</h2><pre id="json"></pre></section>
-<section class="panel wide"><h2>07 / Texto natural → 8 roles IEML</h2><p class="muted">Extracción heurística en español. Los fragmentos identificados son hipótesis editables conceptualmente, no una traducción validada a código IEML.</p><textarea id="naturalText">María envió un informe a Pedro por correo ayer desde Santiago para informar los resultados rápidamente.</textarea><div><button id="naturalAnalyze">Identificar roles</button><button id="spacyAnalyze">Analizar con spaCy</button><button id="iemlAlign">Alinear con IEML</button><button class="alt" id="naturalExport">Exportar roles JSON</button></div><p id="naturalStatus" class="muted"></p><div style="overflow:auto"><table><thead><tr><th>Rol</th><th>Nombre</th><th>Evidencia literal</th><th>Estado</th></tr></thead><tbody id="naturalRows"></tbody></table></div><pre id="naturalJSON"></pre></section></main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
+<section class="panel wide"><h2>07 / Texto natural → 8 roles IEML</h2><p class="muted">Extracción heurística en español. Los fragmentos identificados son hipótesis editables conceptualmente, no una traducción validada a código IEML.</p><textarea id="naturalText">María envió un informe a Pedro por correo ayer desde Santiago para informar los resultados rápidamente.</textarea><div><button id="naturalAnalyze">Identificar roles</button><button id="spacyAnalyze">Analizar con spaCy</button><button id="iemlAlign">Alinear con IEML</button><button class="alt" id="naturalExport">Exportar roles JSON</button></div><p id="naturalStatus" class="muted"></p><div style="overflow:auto"><table><thead><tr><th>Rol</th><th>Nombre</th><th>Evidencia literal</th><th>Estado</th></tr></thead><tbody id="naturalRows"></tbody></table></div><pre id="naturalJSON"></pre></section>
+<section class="panel wide" id="alphabetPanel">
+ <h2>08 / Alfabeto IEML experimental · Matriz 5 × 5</h2>
+ <p class="ieml-help">Modelo aportado en ieml-alphabet.js: filas = sustancia, columnas = atributo. Vectores gráficos de 6 componentes, distintos de los 9 roles y del parser formal IEML v0.4.</p>
+ <div class="ieml-table"><table aria-label="Matriz IEML experimental de 25 caracteres">
+  <thead><tr><th>Sustancia ↓ / Atributo →</th><th>U · Virtual</th><th>A · Actual</th><th>S · Signo</th><th>B · Ser</th><th>T · Cosa</th></tr></thead>
+  <tbody id="alphabetBody"></tbody>
+ </table></div>
+ <p id="alphabetSelected" aria-live="polite"></p>
+ <p id="alphabetDescription"></p><p id="alphabetVector" class="ieml-help"></p>
+ <p class="ieml-help">Vecinos según coseno gráfico 6D (no equivalencia semántica validada):</p>
+ <div class="chips" id="alphabetNeighbors"></div>
+ <label for="alphabetCompare">Comparar con otro símbolo</label>
+ <div><input class="ieml-field" id="alphabetCompare" placeholder="wa, wu, y…" maxlength="2" value="wa">
+ <button id="alphabetCompareBtn" type="button">Calcular coseno</button></div>
+ <output id="alphaComparison" aria-live="polite"></output>
+ <h3>Analizador de símbolos explícitos</h3>
+ <p class="ieml-help">Escribe símbolos separados por espacios, coma o flechas. No se interpretan palabras españolas como códigos IEML.</p>
+ <textarea id="alphabetExpression">wo → wa → y</textarea>
+ <button id="alphabetAnalyzeBtn" type="button">Analizar alfabeto</button>
+ <p id="alphabetParseStatus" aria-live="polite" class="ieml-help"></p>
+ <pre id="alphabetOutput"></pre>
+</section>
+<section class="panel" id="iemlDocsPanel">
+ <h2>09 / Biblioteca de investigación</h2>
+ <p class="ieml-help">Notas incorporadas de ieml-docs.js y los PDF proporcionados. Distinguen formalización propuesta de gramática oficial.</p>
+ <label for="iemlDocsSearch">Filtrar temas</label>
+ <input class="ieml-field" id="iemlDocsSearch" placeholder="alfabeto, recursión, vector…">
+ <p id="iemlDocsCount" class="ieml-help"></p>
+ <div id="iemlDocsResults"></div>
+</section>
+<section class="panel" id="referencePanel">
+ <h2>10 / Diccionario IEML v0.4</h2>
+ <p class="ieml-help">Búsqueda en descriptores en inglés y francés. Requiere servidor Python local y reference.json importado; no confundir coincidencia textual con mapeo formal.</p>
+ <label for="referenceQuery">Concepto para buscar</label>
+ <input class="ieml-field" id="referenceQuery" placeholder="actual, memory, être" value="memory">
+ <button id="referenceSearchBtn" type="button">Buscar en diccionario</button>
+ <p id="referenceStatus" class="ieml-help" aria-live="polite">Consulta disponible con el backend local.</p>
+ <div class="ieml-table"><table><thead><tr><th>Término IEML</th><th>Descriptores</th><th>Tipo</th></tr></thead><tbody id="referenceRows"></tbody></table></div>
+</section>
+</main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
 <script>
 "use strict";
 const entries=[
@@ -148,4 +188,4 @@ document.getElementById("iemlAlign").addEventListener("click",async()=>{
   document.getElementById("naturalJSON").textContent=JSON.stringify(data,null,2);
  }catch(err){status.textContent="No fue posible alinear: "+err.message+". Comprueba el backend local.";}
 });
-</script></body></html>
+</script><script type="module" src="./src/ieml/ui.js"></script></body></html>
