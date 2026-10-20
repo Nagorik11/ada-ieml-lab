@@ -47,3 +47,18 @@ test("research note provenance and filtering",()=>{
   assert.equal(findDocs("NO_EXISTE").length,0);
   assert.ok(IEML_DOCS.every(doc=>doc.source&&doc.id&&doc.category));
 });
+
+test("IEMLdev remarkable multiplication table matches all 25 abbreviation pairs",()=>{
+  // Audited at github.com/IEMLdev/ieml/blob/b49d70bc8a9a548bf6a1066eef8cb975cbf95c91/ieml/constants.py
+  const pairs={
+    U:["wo","wa","y","o","e"],
+    A:["wu","we","u","a","i"],
+    S:["j","g","s","b","t"],
+    B:["h","c","k","m","n"],
+    T:["p","x","d","f","l"]
+  };
+  const order=["U","A","S","B","T"];
+  for(const [row, chars] of Object.entries(pairs))
+    for(let column=0;column<order.length;column++)
+      assert.equal(getCharByCoords(row,order[column]).char,chars[column]);
+});
