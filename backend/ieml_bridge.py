@@ -41,7 +41,8 @@ def validate_usl(expression: str) -> dict[str, Any]:
         "canonical": result["canonical"],
         "engine": result["engine"],
         "dictionaryVerified": False,
-        "sourceCommit": result["sourceCommit"],
+        "reviewedCommit": result["reviewedCommit"],
+        "installedCommitVerified": result["installedCommitVerified"],
     }
 
 
