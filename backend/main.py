@@ -15,6 +15,7 @@ from backend.upstream_database import (
     list_terms as upstream_database_list,
     get_descriptors as upstream_database_descriptors,
     get_relations as upstream_database_relations,
+    get_table as upstream_database_table,
 )
 from backend.upstream_ieml import (
     UpstreamInvalid, UpstreamUnavailable, availability as upstream_availability,
@@ -271,6 +272,18 @@ def upstream_db_relations(term: str, relation: str, limit: int = 30):
     """Query one structural relation; optional and computationally expensive."""
     try:
         return upstream_database_relations(term, relation, limit=limit)
+    except DatabaseUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except DatabaseQueryError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+@app.get("/api/upstream/database/table")
+def upstream_db_table(term: str):
+    """Return 2D cells and the parent from a named IEML table."""
+    try:
+        return upstream_database_table(term)
     except DatabaseUnavailable as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except DatabaseQueryError as exc:
