@@ -236,3 +236,47 @@ def get_relations(
         "source": DATABASE_REPOSITORY,
         "warning": "Relations are computed from the checked-out upstream grammar and dictionary.",
     }
+
+
+def get_table(term: str, *, database: Any = None) -> dict[str, Any]:
+    """Read a small 2D IEML dictionary table and its parent, if defined.
+
+    Notebook examples: dictionary.tables['O:O:.'].cells and
+    dictionary.tables['M:'].parent.script. Limit result size rather than
+    serializing arbitrary NumPy objects into the API response.
+    """
+    term = _validate_text(term)
+    db = database if database is not None else _load_database()
+    try:
+        dictionary = db.get_dictionary()
+        table = dictionary.tables[term]
+        cells = table.cells
+        shape = getattr(cells, "shape", None)
+        if shape is not None and (len(shape) != 2 or shape[0] > 20 or shape[1] > 20):
+            raise DatabaseQueryError("Table dimensions exceed 20x20 serialization limit")
+        rows = []
+        for row in cells:
+            converted = [str(cell) for cell in row]
+            if len(converted) > 20:
+                raise DatabaseQueryError("Table has more than 20 columns")
+            rows.append(converted)
+            if len(rows) > 20:
+                raise DatabaseQueryError("Table has more than 20 rows")
+        parent = getattr(table, "parent", None)
+        parent_script = getattr(parent, "script", None)
+    except DatabaseQueryError:
+        raise
+    except (KeyError, IndexError) as exc:
+        raise DatabaseQueryError(f"IEML table not found: {term}") from exc
+    except Exception as exc:
+        raise DatabaseQueryError(
+            f"Could not read IEML table: {type(exc).__name__}: {str(exc)[:180]}"
+        ) from exc
+    return {
+        "schema": "ada-ieml-database-table/v1",
+        "term": term,
+        "parent": str(parent_script) if parent_script is not None else None,
+        "shape": [len(rows), len(rows[0]) if rows else 0],
+        "cells": rows,
+        "source": DATABASE_REPOSITORY,
+    }
