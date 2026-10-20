@@ -30,6 +30,8 @@ RELATION_FILTERS = frozenset({
     "contains", "contained", "father_substance", "child_substance",
     "father_attribute", "child_attribute", "father_mode", "child_mode",
     "opposed", "associated", "crossed", "twin",
+    "identity", "table_0", "table_1", "table_2", "table_3", "table_4",
+    "table_5",
 })
 MAX_TERM_LENGTH = 2048
 MAX_LIMIT = 100
@@ -203,8 +205,10 @@ def get_relations(
 ) -> dict[str, Any]:
     """Read one typed relation via the upstream computed dictionary graph.
 
-    Potentially expensive: .get_dictionary() may build an in-memory graph
-    on first use. Queries should be private/local unless isolated/limited.
+    Potentially expensive: .get_dictionary() builds dense relation data in
+    the original RelationsGraph constructor; potential quadratic RAM use.
+    Legacy scipy/numpy code includes np.bool, which is deprecated/removed.
+    Queries should remain local/private until separately isolated.
     """
     term = _validate_text(term)
     if relation not in RELATION_FILTERS:
