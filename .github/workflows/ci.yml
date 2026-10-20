@@ -22,6 +22,8 @@ jobs:
           grep -q 'id="iemlDocsResults"' index.html
           grep -q 'id="canonicalPanel"' index.html
           grep -q 'src/ieml/canonical-ui.js' index.html
+          grep -q 'id="upstreamPanel"' index.html
+          grep -q 'src/ieml/upstream-ui.js' index.html
       - name: Check all inline JavaScript blocks
         run: |
           node --input-type=commonjs - <<'NODE'
@@ -37,5 +39,5 @@ jobs:
         run: npm run check
       - name: Run IEML JS unit tests
         run: npm test
-      - name: Run Python reference, alignment and canonical-basis tests
-        run: python -m unittest backend.test_reference backend.test_ieml_bridge backend.test_canonical_space -v
+      - name: Run Python reference, alignment, canonical and upstream adapter tests
+        run: python -m unittest backend.test_reference backend.test_ieml_bridge backend.test_canonical_space backend.test_upstream_ieml -v
