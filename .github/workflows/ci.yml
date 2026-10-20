@@ -1,0 +1,26 @@
+name: Validate ADA IEML Lab
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check HTML entrypoint
+        run: test -s index.html
+      - name: Check inline JavaScript syntax
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const vm = require('node:vm');
+          const html = fs.readFileSync('index.html', 'utf8');
+          const match = html.match(/<script>([\s\S]*?)<\/script>/);
+          if (!match) throw Error('Missing inline JavaScript');
+          new vm.Script(match[1], {filename: 'index.html'});
+          console.log('Inline JavaScript syntax OK');
+          NODE
