@@ -78,6 +78,31 @@
  <div id="canonicalVectors"></div>
  <details><summary>Resultado completo y trazabilidad JSON</summary><pre id="canonicalJSON"></pre></details>
 </section>
+
+<section class="panel wide" id="upstreamPanel">
+  <h2>12 / Parser IEML original · IEMLdev/ieml</h2>
+  <p class="ieml-help">Integración opcional con la biblioteca IEML original de <a href="https://github.com/IEMLdev/ieml" target="_blank" rel="noopener noreferrer">IEMLdev</a> (GPL-3.0, código upstream de 2021). Se mantiene separada del modelo experimental de bases canónicas ℝ⁹ y del análisis de glifos Ingress.</p>
+  <h3>Direcciones sintagmáticas documentadas</h3>
+  <p class="ieml-help">Correspondencias estructurales a los roles definidos en <a href="https://github.com/IEMLdev/ieml/blob/master/ieml/usl/constants.py" target="_blank" rel="noopener noreferrer">ieml/usl/constants.py</a>. Para e0 no hay dirección única: se muestran las posibles valencias del proceso.</p>
+  <div class="ieml-table"><table aria-label="Correspondencias de bases canónicas y direcciones sintagmáticas upstream">
+    <thead><tr><th>Base</th><th>Rol</th><th>Script de dirección</th><th>Valencias de proceso (e0)</th></tr></thead>
+    <tbody id="upstreamRolesRows"></tbody>
+  </table></div>
+  <h3>Validación sintáctica opcional</h3>
+  <p class="ieml-help">El backend utilizará el parser original solo si está instalado. Una expresión válida sintácticamente no garantiza pertenencia al diccionario ni equivalencia semántica con una oración en español.</p>
+  <div class="canonical-controls">
+    <label for="upstreamKind">Tipo de expresión
+      <select id="upstreamKind"><option value="script">Script (término)</option><option value="usl">USL (unidad sintagmática)</option></select>
+    </label>
+  </div>
+  <label for="upstreamExpression">Expresión IEML</label>
+  <textarea id="upstreamExpression" spellcheck="false">wa.</textarea>
+  <div><button id="upstreamParseBtn" type="button">Validar con parser upstream</button>
+       <button id="upstreamStatusBtn" type="button" class="alt">Comprobar disponibilidad</button></div>
+  <p class="ieml-help" id="upstreamStatus" role="status">El parser upstream requiere instalación Python opcional.</p>
+  <p id="upstreamResult" role="status"></p>
+  <details><summary>Respuesta JSON y procedencia</summary><pre id="upstreamParseJSON"></pre><pre id="upstreamStatusJSON"></pre></details>
+</section>
 </main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
 <script>
 "use strict";
@@ -214,4 +239,4 @@ document.getElementById("iemlAlign").addEventListener("click",async()=>{
   document.getElementById("naturalJSON").textContent=JSON.stringify(data,null,2);
  }catch(err){status.textContent="No fue posible alinear: "+err.message+". Comprueba el backend local.";}
 });
-</script><script type="module" src="./src/ieml/ui.js"></script><script type="module" src="./src/ieml/canonical-ui.js"></script></body></html>
+</script><script type="module" src="./src/ieml/ui.js"></script><script type="module" src="./src/ieml/canonical-ui.js"></script><script type="module" src="./src/ieml/upstream-ui.js"></script></body></html>
