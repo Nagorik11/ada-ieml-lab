@@ -12,7 +12,7 @@
 <section class="panel"><h2>04 / Signos y roles</h2><div style="overflow:auto"><table><thead><tr><th>Glifo</th><th>Familia</th><th>Rol</th><th>Significado</th></tr></thead><tbody id="rows"></tbody></table></div></section>
 <section class="panel"><h2>05 / Lectura semiótica</h2><p id="reading"></p><div id="transitions"></div><small>Clasificación y roles heurísticos: no equivalen a análisis IEML formal.</small></section>
 <section class="panel wide"><h2>06 / Datos</h2><pre id="json"></pre></section>
-<section class="panel wide"><h2>07 / Texto natural → 8 roles IEML</h2><p class="muted">Extracción heurística en español. Los fragmentos identificados son hipótesis editables conceptualmente, no una traducción validada a código IEML.</p><textarea id="naturalText">María envió un informe a Pedro por correo ayer desde Santiago para informar los resultados rápidamente.</textarea><div><button id="naturalAnalyze">Identificar roles</button><button id="spacyAnalyze">Analizar con spaCy</button><button class="alt" id="naturalExport">Exportar roles JSON</button></div><p id="naturalStatus" class="muted"></p><div style="overflow:auto"><table><thead><tr><th>Rol</th><th>Nombre</th><th>Evidencia literal</th><th>Estado</th></tr></thead><tbody id="naturalRows"></tbody></table></div><pre id="naturalJSON"></pre></section></main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
+<section class="panel wide"><h2>07 / Texto natural → 8 roles IEML</h2><p class="muted">Extracción heurística en español. Los fragmentos identificados son hipótesis editables conceptualmente, no una traducción validada a código IEML.</p><textarea id="naturalText">María envió un informe a Pedro por correo ayer desde Santiago para informar los resultados rápidamente.</textarea><div><button id="naturalAnalyze">Identificar roles</button><button id="spacyAnalyze">Analizar con spaCy</button><button id="iemlAlign">Alinear con IEML</button><button class="alt" id="naturalExport">Exportar roles JSON</button></div><p id="naturalStatus" class="muted"></p><div style="overflow:auto"><table><thead><tr><th>Rol</th><th>Nombre</th><th>Evidencia literal</th><th>Estado</th></tr></thead><tbody id="naturalRows"></tbody></table></div><pre id="naturalJSON"></pre></section></main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
 <script>
 "use strict";
 const entries=[
@@ -118,5 +118,34 @@ document.getElementById("spacyAnalyze").addEventListener("click", async () => {
  } catch(err) {
    status.textContent="Motor spaCy no disponible: "+err.message+". Inicia el backend local o usa Identificar roles.";
  }
+});
+</script><script>
+document.getElementById("iemlAlign").addEventListener("click",async()=>{
+ const status=document.getElementById("naturalStatus");
+ status.textContent="Buscando correspondencias IEML documentadas…";
+ try{
+  const response=await fetch("http://127.0.0.1:8001/api/align",{
+   method:"POST",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({text:document.getElementById("naturalText").value,validate:false})
+  });
+  if(!response.ok)throw Error("HTTP "+response.status);
+  const data=await response.json();
+  naturalResult=data;
+  const body=document.getElementById("naturalRows");body.replaceChildren();
+  let found=0;
+  for(const sentence of data.sentences){
+   for(const role of sentence.roles){
+    const tr=document.createElement("tr");
+    const labels=(role.candidates||[]).map(c=>c.ieml+" ["+c.source+"]");
+    found+=labels.length;
+    for(const value of [role.id,role.role,role.evidence||"—",labels.join("; ")||"sin correspondencia verificada"]){
+     const td=document.createElement("td");td.textContent=String(value);tr.appendChild(td);
+    }
+    body.appendChild(tr);
+   }
+  }
+  status.textContent="Alineación terminada: "+found+" correspondencias documentadas. Léxico actual: "+data.dictionaryEntries+" entradas.";
+  document.getElementById("naturalJSON").textContent=JSON.stringify(data,null,2);
+ }catch(err){status.textContent="No fue posible alinear: "+err.message+". Comprueba el backend local.";}
 });
 </script></body></html>
