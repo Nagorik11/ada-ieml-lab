@@ -1,26 +1,48 @@
 # ADA IEML Semiotic Lab
 
-Laboratorio web experimental para analizar secuencias de glifos con herramientas de semiótica, gramática y distribución de familias.
+Laboratorio semiótico experimental con análisis de glifos, roles gramaticales, explorador de alfabeto e interfaz de referencia del diccionario IEML v0.4.
 
-## Características
-- Tokenización de secuencias separadas por flechas, comas o espacios.
-- Clasificación experimental de familias C/L/A/D.
-- Conteo y entropía de Shannon sobre familias reconocidas.
-- Relaciones sintagmáticas y grafo de la secuencia.
-- Roles actanciales heurísticos y exportación JSON.
+## Funcionalidades
 
-**Alcance:** La aplicación NO es un parser oficial del Information Economy MetaLanguage (IEML). El mapeo de glifos de Ingress a familias y roles es una hipótesis experimental.
+- Glifos Ingress: tokenización, clasificación experimental C/L/A/D, entropía de Shannon y grafo sintagmático.
+- Lenguaje natural: identificación heurística de raíz + ocho roles; análisis opcional con spaCy y FastAPI.
+- Alineación candidata IEML: diccionario curado con registros de procedencia, no generación automática de USL.
+- **Alfabeto 5 × 5 (nuevo):** 25 símbolos con etiquetas bilingües, coordenadas U/A/S/B/T, vectores gráficos 6D y comparación coseno.
+- **Biblioteca de investigación (nuevo):** documentación local con procedencia, búsqueda y aviso de modelos experimentales.
+- **Explorador de referencia (nuevo):** búsqueda EN/FR en datos IEML v0.4, si el backend y el JSON están disponibles.
 
-## Ejecución
+## Iniciar la interfaz
 
-Abre `index.html` en un navegador moderno. No requiere servidor, dependencias ni claves.
+```bash
+python3 -m http.server 8000
+# Abrir http://127.0.0.1:8000
+```
 
-## Publicación
+El servidor HTTP es necesario para importar los módulos ES de las secciones 08–10. Los paneles 08 y 09 funcionan sin backend y sin claves.
 
-GitHub Pages puede servir el directorio raíz de la rama `main` desde Settings → Pages → Deploy from a branch.
+## Pruebas
 
-## Próximos pasos
-- Parser IEML formal y pruebas de conformidad.
-- Importación de catálogos JSON.
-- Integración opcional con ADA /ask mediante un backend autorizado.
-- Persistencia y comparativas de análisis.
+```bash
+npm run check
+npm test
+python3 -m unittest backend.test_reference backend.test_ieml_bridge
+```
+
+No se requieren paquetes npm externos. CI valida todos los scripts inline y los nuevos módulos.
+
+## Backend Python opcional
+
+Las instrucciones para FastAPI y spaCy están en [backend/README.md](backend/README.md). Para utilizar el panel 10, importar los datos de referencia desde los tres JS originales:
+
+```bash
+node tools/import_reference.mjs reference data/ieml-v04
+uvicorn backend.main:app --host 127.0.0.1 --port 8001
+```
+
+La referencia IEML v0.4 no se almacena íntegra en este repositorio: debe generarse a partir de los archivos originales proporcionados. Sin ella la API de referencia responde HTTP 503.
+
+## Alcance y límites
+
+**No es un parser oficial IEML.** Las familias de glifos, las proyecciones 9D y la matriz de 25 símbolos proceden de modelos de investigación experimentales. El modelo 5×5/6D, la morfología v0.4 basada en seis primitivos y el espacio de nueve roles no son intercambiables. La similitud coseno de vectores gráficos tampoco garantiza similitud semántica.
+
+Consultar [documentación de integración](docs/MODULE_INTEGRATION.md) y [alineación IEML](docs/IEML_ALIGNMENT.md).
