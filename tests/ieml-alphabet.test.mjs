@@ -26,7 +26,8 @@ test("source alphabet coordinate and vector examples",()=>{
   assert.equal(getChar("invalid"),null);
 });
 test("cosine similarity is symmetric, normalized and not artificially boosted",()=>{
-  assert.equal(cosineSimilarity("wo","wo"),1);
+  // Dot products and norms can differ by ~1 ULP in floating-point arithmetic.
+  assert.ok(Math.abs(cosineSimilarity("wo","wo") - 1) < 1e-12);
   assert.equal(cosineSimilarity("wo","UNKNOWN"),null);
   for(const a of ALPHABET)for(const b of ALPHABET) {
     const ab=cosineSimilarity(a,b),ba=cosineSimilarity(b,a);
