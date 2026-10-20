@@ -46,3 +46,15 @@ La referencia IEML v0.4 no se almacena íntegra en este repositorio: debe genera
 **No es un parser oficial IEML.** Las familias de glifos, las proyecciones 9D y la matriz de 25 símbolos proceden de modelos de investigación experimentales. El modelo 5×5/6D, la morfología v0.4 basada en seis primitivos y el espacio de nueve roles no son intercambiables. La similitud coseno de vectores gráficos tampoco garantiza similitud semántica.
 
 Consultar [documentación de integración](docs/MODULE_INTEGRATION.md) y [alineación IEML](docs/IEML_ALIGNMENT.md).
+
+## Bases canónicas R⁹ (nuevo)
+
+La sección **11 / Asignación de bases canónicas** utiliza las evidencias de roles detectadas por spaCy para construir explícitamente `s = Σ cᵢ eᵢ` en una base ortonormal de nueve componentes. Incluye vector de presencia o confianza heurística, proyección a subespacios, acento opcional y exportación JSON.
+
+- `POST /api/analyze` devuelve un campo `canonical` por oración.
+- `POST /api/canonical` permite controlar modo, acento y proyección del texto.
+- `POST /api/canonical/roles` permite asignar bases a roles editados, incluso pesos numéricos manuales.
+- `backend/canonical_space.py` es independiente de spaCy, NumPy y de cualquier dependencia externa.
+- `python3 -m unittest backend.test_canonical_space -v` verifica propiedades algebraicas.
+
+Véase [documentación de bases canónicas](docs/CANONICAL_BASIS.md). **Se trata de codificación estructural de roles y no de semántica USL certificada.**
