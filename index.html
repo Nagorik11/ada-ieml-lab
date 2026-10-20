@@ -12,7 +12,7 @@
 <section class="panel"><h2>04 / Signos y roles</h2><div style="overflow:auto"><table><thead><tr><th>Glifo</th><th>Familia</th><th>Rol</th><th>Significado</th></tr></thead><tbody id="rows"></tbody></table></div></section>
 <section class="panel"><h2>05 / Lectura semiótica</h2><p id="reading"></p><div id="transitions"></div><small>Clasificación y roles heurísticos: no equivalen a análisis IEML formal.</small></section>
 <section class="panel wide"><h2>06 / Datos</h2><pre id="json"></pre></section>
-</main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
+<section class="panel wide"><h2>07 / Texto natural → 8 roles IEML</h2><p class="muted">Extracción heurística en español. Los fragmentos identificados son hipótesis editables conceptualmente, no una traducción validada a código IEML.</p><textarea id="naturalText">María envió un informe a Pedro por correo ayer desde Santiago para informar los resultados rápidamente.</textarea><div><button id="naturalAnalyze">Identificar roles</button><button class="alt" id="naturalExport">Exportar roles JSON</button></div><p id="naturalStatus" class="muted"></p><div style="overflow:auto"><table><thead><tr><th>Rol</th><th>Nombre</th><th>Evidencia literal</th><th>Estado</th></tr></thead><tbody id="naturalRows"></tbody></table></div><pre id="naturalJSON"></pre></section></main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
 <script>
 "use strict";
 const entries=[
@@ -50,4 +50,45 @@ function draw(tokens){
 }
 $("analyze").addEventListener("click",analyze);$("example").addEventListener("click",()=>{$("expression").value="seek → truedata → evolution → create";analyze()});
 $("export").addEventListener("click",()=>{if(!result)analyze();const url=URL.createObjectURL(new Blob([JSON.stringify(result,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="ada-ieml-analysis.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});analyze();
+</script><script>
+"use strict";
+const ROLES=["Raíz","Iniciador","Interactante","Destinatario","Causa / medio","Tiempo","Lugar","Intención","Manera"];
+let naturalResult=null;
+function normalized(t){return t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
+function roleAnalyze(text){
+ const original=text.trim(),clean=original.replace(/\s+/g," ");
+ const result=Array.from({length:9},(_,id)=>({id,role:ROLES[id],evidence:null,status:"no identificado",method:null}));
+ const set=(id,value,method)=>{if(value&&value.trim()){result[id].evidence=value.trim().replace(/[.,;!?]+$/,"");result[id].status="candidato";result[id].method=method;}};
+ if(!clean)return {schema:"ada-ieml-roles/v1",language:"es",text:original,roles:result,warnings:["Texto vacío"]};
+ const words=clean.split(/\s+/);
+ const verb=/\b(?:envió|envia|envió|entregó|dio|mandó|escribió|creó|compró|vendió|llevó|explicó|presentó|estudió|analizó|construyó|desarrolló|realizó|hizo|observó|encontró|recibió|enseñó|ayudó|viajó|trabajó|publicó|investigó|enviar|entregar|crear|analizar|construir|estudiar|escribir|investigar|comprar|vender|explicar|trabajar|viajar|fue|es|son|está|están|tiene|tienen|puede|pueden|debe|deben)\b/i;
+ const m=verb.exec(clean);
+ if(m){set(0,m[0],"verbo del léxico limitado");const before=clean.slice(0,m.index).trim();if(before)set(1,before,"segmento anterior al verbo");}
+ const markers=[
+ [3,/\b(?:a|para)\s+(?:[A-ZÁÉÍÓÚÑ][\p{L}]+|él|ella|ellos|ellas|nosotros|ustedes)\b/u],
+ [4,/\b(?:por medio de|mediante|con ayuda de|a causa de|debido a|por)\s+[^,.;]+/i],
+ [5,/\b(?:ayer|hoy|mañana|anteayer|anoche|ahora|antes|después|luego|temprano|tarde|el lunes|el martes|el miércoles|el jueves|el viernes|el sábado|el domingo|durante\s+[^,.;]+|en\s+\d{4})\b/i],
+ [6,/\b(?:desde|hacia|dentro de|en|sobre|junto a)\s+(?:[A-ZÁÉÍÓÚÑ][\p{L}]+|la\s+[\p{L}]+|el\s+[\p{L}]+|un\s+[\p{L}]+|una\s+[\p{L}]+)/u],
+ [7,/\b(?:para|con el fin de|con el propósito de|a fin de)\s+(?:[a-záéíóúñ]+(?:\s+(?:los|las|el|la|un|una|de|del|a|al|y|[a-záéíóúñ]+)){0,5})/i],
+ [8,/\b[a-záéíóúñ]+mente\b/i]
+ ];
+ for(const [id,re] of markers){const hit=clean.match(re);if(hit)set(id,hit[0],"patrón léxico");}
+ // Prefer a purpose clause over an ambiguous recipient beginning with 'para'.
+ if(result[3].evidence&&/^para\b/i.test(result[3].evidence))result[3]={id:3,role:ROLES[3],evidence:null,status:"no identificado",method:null};
+ // Extract object between verb and first detected adjunct marker.
+ if(m){const after=clean.slice(m.index+m[0].length).trim();const starts=[...after.matchAll(/\b(?:a|para|por|mediante|desde|hacia|en|con el fin de|ayer|hoy|mañana|antes|después)\b/gi)].map(x=>x.index);const obj=after.slice(0,starts.length?Math.min(...starts):after.length).trim();if(obj)set(2,obj,"segmento posterior al verbo");}
+ // Avoid confusing an intention clause with an explicit recipient.
+ if(result[3].evidence&&result[7].evidence&&normalized(result[7].evidence).startsWith(normalized(result[3].evidence)))result[3]={id:3,role:ROLES[3],evidence:null,status:"no identificado",method:null};
+ return {schema:"ada-ieml-roles/v1",language:"es",text:original,roles:result,warnings:["Análisis basado en reglas: puede confundir sujeto, objeto y complementos.","Los roles no constituyen por sí mismos una expresión formal IEML.","No se infieren roles ausentes; revise las evidencias antes de usarlas."]};
+}
+function runNatural(){
+ naturalResult=roleAnalyze(document.getElementById("naturalText").value);
+ const body=document.getElementById("naturalRows");body.replaceChildren();
+ for(const role of naturalResult.roles){const tr=document.createElement("tr");for(const val of [String(role.id),role.role,role.evidence||"—",role.status]){const td=document.createElement("td");td.textContent=val;tr.appendChild(td);}body.appendChild(tr);}
+ const n=naturalResult.roles.filter(r=>r.evidence).length;document.getElementById("naturalStatus").textContent=n+" de 9 roles con candidatos (incluye raíz). Revise las ambigüedades.";
+ document.getElementById("naturalJSON").textContent=JSON.stringify(naturalResult,null,2);
+}
+document.getElementById("naturalAnalyze").addEventListener("click",runNatural);
+document.getElementById("naturalExport").addEventListener("click",()=>{if(!naturalResult)runNatural();const url=URL.createObjectURL(new Blob([JSON.stringify(naturalResult,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="ieml-natural-roles.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+runNatural();
 </script></body></html>
