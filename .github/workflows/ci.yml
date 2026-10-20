@@ -48,4 +48,4 @@ jobs:
       - name: Compile all Python backend modules
         run: python -m compileall -q backend
       - name: Run Python reference, alignment, canonical and database tests
-        run: python -m unittest backend.test_reference backend.test_ieml_bridge backend.test_canonical_space backend.test_upstream_ieml backend.test_upstream_database backend.test_lattice backend.test_script_inspector backend.test_upstream_sources -v
+        run: python -m unittest backend.test_reference backend.test_ieml_bridge backend.test_canonical_space backend.test_upstream_ieml backend.test_upstream_database backend.test_lattice backend.test_script_inspector backend.test_upstream_sources backend.test_operator_bridge -v
