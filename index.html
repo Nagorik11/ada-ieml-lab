@@ -15,7 +15,7 @@
 <section class="panel wide"><h2>07 / Texto natural → 8 roles IEML</h2><p class="muted">Extracción heurística en español. Los fragmentos identificados son hipótesis editables conceptualmente, no una traducción validada a código IEML.</p><textarea id="naturalText">María envió un informe a Pedro por correo ayer desde Santiago para informar los resultados rápidamente.</textarea><div><button id="naturalAnalyze">Identificar roles</button><button id="spacyAnalyze">Analizar con spaCy</button><button id="iemlAlign">Alinear con IEML</button><button class="alt" id="naturalExport">Exportar roles JSON</button></div><p id="naturalStatus" class="muted"></p><div style="overflow:auto"><table><thead><tr><th>Rol</th><th>Nombre</th><th>Evidencia literal</th><th>Estado</th></tr></thead><tbody id="naturalRows"></tbody></table></div><pre id="naturalJSON"></pre></section>
 <section class="panel wide" id="alphabetPanel">
  <h2>08 / Alfabeto IEML experimental · Matriz 5 × 5</h2>
- <p class="ieml-help">Modelo aportado en ieml-alphabet.js: filas = sustancia, columnas = atributo. Vectores gráficos de 6 componentes, distintos de los 9 roles y del parser formal IEML v0.4.</p>
+ <p class="ieml-help">Los 25 símbolos coinciden con la tabla de abreviaturas IEMLdev/ieml. Las etiquetas descriptivas y los vectores gráficos de 6 componentes provienen del modelo aportado y son experimentales; no equivalen a los 9 roles ni a embeddings de conceptos.</p>
  <div class="ieml-table"><table aria-label="Matriz IEML experimental de 25 caracteres">
   <thead><tr><th>Sustancia ↓ / Atributo →</th><th>U · Virtual</th><th>A · Actual</th><th>S · Signo</th><th>B · Ser</th><th>T · Cosa</th></tr></thead>
   <tbody id="alphabetBody"></tbody>
