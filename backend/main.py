@@ -9,6 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.ieml_bridge import align_roles
 from backend.canonical_space import assign_roles as canonical_assign_roles, assign_analysis as canonical_assign_analysis
+from backend.upstream_ieml import (
+    UpstreamInvalid, UpstreamUnavailable, availability as upstream_availability,
+    parse_expression as upstream_parse_expression, role_addresses as upstream_role_addresses,
+)
 from backend.reference import lookup as reference_lookup, search as reference_search, neighbors as reference_neighbors
 import spacy
 
@@ -32,6 +36,11 @@ class AlignmentRequest(BaseModel):
 
 class Request(BaseModel):
     text: str = Field(min_length=1, max_length=15000)
+
+
+class UpstreamParseRequest(BaseModel):
+    expression: str = Field(min_length=1, max_length=2048)
+    kind: Literal["script", "usl"] = "script"
 
 
 class CanonicalTextRequest(Request):
@@ -184,3 +193,27 @@ def get_reference_neighbors(term: str, limit: int = 50):
         return {"term": term, "edges": reference_neighbors(term, min(max(limit, 1), 100))}
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
+
+@app.get("/api/upstream/status")
+def upstream_status():
+    """Non-invasive installation and provenance metadata."""
+    return upstream_availability()
+
+
+@app.get("/api/upstream/roles")
+def upstream_roles():
+    """R9 coordinates versus original IEML syntagmatic address scripts."""
+    return upstream_role_addresses()
+
+
+@app.post("/api/upstream/parse")
+def upstream_parse(request: UpstreamParseRequest):
+    """Opt-in syntax verification via the installed upstream GPL-3.0 parser."""
+    try:
+        return upstream_parse_expression(request.expression, request.kind)
+    except UpstreamUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except UpstreamInvalid as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
