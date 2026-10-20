@@ -1,0 +1,10 @@
+{
+  "name": "ada-ieml-lab",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check src/ieml/alphabet.js && node --check src/ieml/docs.js && node --check src/ieml/ui.js"
+  }
+}
