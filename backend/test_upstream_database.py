@@ -6,7 +6,7 @@ from unittest.mock import patch, Mock
 
 from backend.upstream_database import (
     DatabaseQueryError, DatabaseUnavailable, database_status,
-    get_descriptors, get_relations, list_terms, _load_database,
+    get_descriptors, get_relations, get_table, list_terms, _load_database,
 )
 
 
@@ -32,8 +32,21 @@ class FakeRelations:
         return ["wa.", "we.", "wu."]
 
 
+class FakeTables:
+    def __getitem__(self, term):
+        if term != "O:O:.":
+            raise KeyError(term)
+        class Parent:
+            script = "F:"
+        class Table:
+            parent = Parent()
+            cells = [["wa.", "we."], ["wu.", "wo."]]
+        return Table()
+
+
 class FakeDictionary:
     relations = FakeRelations()
+    tables = FakeTables()
 
 
 class FakeDatabase:
@@ -86,6 +99,14 @@ class DatabaseAdapterTests(unittest.TestCase):
                                script_parser=lambda x: x, limit=2)
         self.assertEqual(result["items"], ["wa.", "we."])
         self.assertEqual(result["total"], 3)
+
+    def test_table_cells_and_parent(self):
+        result = get_table("O:O:.", database=self.db)
+        self.assertEqual(result["shape"], [2, 2])
+        self.assertEqual(result["parent"], "F:")
+        self.assertEqual(result["cells"][0], ["wa.", "we."])
+        with self.assertRaises(DatabaseQueryError):
+            get_table("INVALID", database=self.db)
 
     def test_input_validation(self):
         errors = [
