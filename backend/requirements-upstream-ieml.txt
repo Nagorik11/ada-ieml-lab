@@ -1,0 +1,5 @@
+# Integración opcional del parser original IEMLdev/ieml (GPL-3.0)
+# Revisión fijada: b49d70bc8a9a548bf6a1066eef8cb975cbf95c91 (2021-03-08)
+# IMPORTANTE: biblioteca externa antigua; instalar solo después de revisar
+# las dependencias y licencias en un entorno aislado.
+ieml @ git+https://github.com/IEMLdev/ieml.git@b49d70bc8a9a548bf6a1066eef8cb975cbf95c91
