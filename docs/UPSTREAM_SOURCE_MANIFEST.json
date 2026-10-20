@@ -1,0 +1,58 @@
+{
+  "schema": "ada-ieml-upstream-sources/v1",
+  "repository": "https://github.com/IEMLdev/ieml",
+  "commit": "b49d70bc8a9a548bf6a1066eef8cb975cbf95c91",
+  "license": "GPL-3.0",
+  "verified": "Identical Git blob SHA-1 values between 7 supplied uploads and upstream git tree at the pinned commit",
+  "files": [
+    {
+      "uploaded_name": "lexer.py",
+      "upstream_path": "ieml/dictionary/script/parser/lexer.py",
+      "size": 959,
+      "sha256": "f6acb3ff931a3c8ab769c9de7930acc53bb7900188e6f2f04f9a9c0d0337e0bf",
+      "git_blob_sha1": "b397cef644df638803c734e2fe7a38220ece80e4"
+    },
+    {
+      "uploaded_name": "parser.py",
+      "upstream_path": "ieml/dictionary/script/parser/parser.py",
+      "size": 6406,
+      "sha256": "0c6992f4653f788d1da05eba2c88d95b973051da1485f77c6e4cc8308f4afb89",
+      "git_blob_sha1": "e034ce32f003146e02e96fde695c30fd5a64492e"
+    },
+    {
+      "uploaded_name": "dictionary.py",
+      "upstream_path": "ieml/dictionary/dictionary.py",
+      "size": 2971,
+      "sha256": "73a0556cf7aae8034dff73e2b8903fb5f7ddb909d65fc0b301d8d489acb42062",
+      "git_blob_sha1": "cd82409e14f7e1ef6e2ddcdf72c86a7be88a982d"
+    },
+    {
+      "uploaded_name": "script.py",
+      "upstream_path": "ieml/dictionary/script/script.py",
+      "size": 23759,
+      "sha256": "3e4b407e5a2256cf52a2d267a1ba0c90035d6e9a850316e9d2f3ed59bcc3e21a",
+      "git_blob_sha1": "7f4adca6afdaf95d0962ff309f05b825eecd6543"
+    },
+    {
+      "uploaded_name": "tools.py",
+      "upstream_path": "ieml/dictionary/script/tools.py",
+      "size": 4676,
+      "sha256": "0a26894539b13fe67853e05dacfd9639d2758888770305760ab95dfc6fc5c541",
+      "git_blob_sha1": "66e2807a40641d4638bf441574597a6fca5c493b"
+    },
+    {
+      "uploaded_name": "operator.py",
+      "upstream_path": "ieml/dictionary/script/operator.py",
+      "size": 1030,
+      "sha256": "82eabb56419737dc8da0e74d05563bfbb71acf1a5b473d946eec0e98f6824092",
+      "git_blob_sha1": "5c05d540fdb8dbec9a1e8a67427914ef4dda611b"
+    },
+    {
+      "uploaded_name": "relations.py",
+      "upstream_path": "ieml/dictionary/relation/relations.py",
+      "size": 11043,
+      "sha256": "d100c6fb41f2147093c7c59b73ea4947345615e78735380531f6e8f825813fb9",
+      "git_blob_sha1": "24c35088873d79507495217b6f96e2f6e817cd41"
+    }
+  ]
+}
