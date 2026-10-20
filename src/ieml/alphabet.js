@@ -1,8 +1,10 @@
 /**
  * ADA IEML Lab — 25-cell alphabet explorer.
- * Derived from the user-provided ieml-alphabet.js.
- * This 5×5 matrix/6D graphic embedding is an experimental research model,
- * distinct from the v0.4 parser's six primitives (E,U,A,S,B,T).
+ * 25 character pairs match the upstream IEMLdev/ieml constants.py
+ * remarkable_multiplication_lookup_table (audited commit b49d70bc8a9a548bf6a1066eef8cb975cbf95c91).
+ * The six-component graphic vectors and character descriptions are from the
+ * user-provided ieml-alphabet.js and are EXPERIMENTAL, not upstream semantics.
+ * Upstream grammar also recognizes E (null) as a separate primitive.
  */
 export const AXES = Object.freeze([
   { key:"U", en:"Virtual", es:"Virtual" },
