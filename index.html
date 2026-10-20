@@ -103,6 +103,79 @@
   <p id="upstreamResult" role="status"></p>
   <details><summary>Respuesta JSON y procedencia</summary><pre id="upstreamParseJSON"></pre><pre id="upstreamStatusJSON"></pre></details>
 </section>
+
+<section class="panel wide" id="databasePanel">
+  <h2>13 / IEMLDatabase · Diccionario histórico y traducciones</h2>
+  <p class="ieml-help">Módulo desarrollado a partir del notebook <code>IEMLDatabase.ipynb</code> aportado. Funciona únicamente con una copia local explícita de <a href="https://github.com/IEMLdev/ieml-language" target="_blank" rel="noopener noreferrer">IEMLdev/ieml-language</a> y el paquete Python externo opcional. No utiliza credenciales SSH ni modifica el repositorio de origen.</p>
+  <div><button type="button" class="alt" id="databaseStatusBtn">Comprobar base local</button></div>
+  <p id="databaseStatus" class="ieml-help" role="status">Para habilitarlo, define <code>IEML_DATABASE_PATH</code> en el servidor y consulta la documentación.</p>
+  <details><summary>Estado y procedencia</summary><pre id="databaseStatusJSON"></pre></details>
+
+  <h3>USL registradas</h3>
+  <div class="canonical-controls">
+    <label for="databaseKind">Tipo
+      <select id="databaseKind"><option value="">Todos</option><option value="morpheme">Morfema</option><option value="polymorpheme">Polimorfema</option><option value="lexeme">Lexema</option><option value="word">Palabra</option></select>
+    </label>
+    <label for="databaseListQuery">Filtro por expresión
+      <input type="text" id="databaseListQuery" maxlength="200" placeholder="wa.">
+    </label>
+  </div>
+  <button type="button" id="databaseListBtn">Listar USL</button>
+  <p id="databaseListStatus" class="ieml-help" role="status"></p>
+  <div id="databaseTermResults" class="chips"></div>
+  <details><summary>Listado JSON</summary><pre id="databaseListJSON"></pre></details>
+
+  <h3>Traducciones y metadatos</h3>
+  <div class="canonical-controls">
+    <label for="databaseTerm">Expresión exacta
+      <input type="text" id="databaseTerm" value="wa." maxlength="2048">
+    </label>
+    <label for="databaseLanguage">Idioma
+      <select id="databaseLanguage"><option value="">Ambos</option><option value="en">Inglés</option><option value="fr">Francés</option></select>
+    </label>
+  </div>
+  <button type="button" id="databaseDescriptorBtn">Obtener descriptores</button>
+  <p id="databaseDescriptorStatus" class="ieml-help" role="status"></p>
+  <div class="ieml-table"><table aria-label="Descriptores del diccionario IEML">
+    <thead><tr><th>USL</th><th>Idioma</th><th>Campo</th><th>Valor</th></tr></thead>
+    <tbody id="databaseDescriptorRows"></tbody>
+  </table></div>
+  <details><summary>Descriptores JSON</summary><pre id="databaseDescriptorJSON"></pre></details>
+
+  <h3>Relaciones del grafo</h3>
+  <div class="canonical-controls">
+    <label for="databaseRelationKind">Tipo de relación
+      <select id="databaseRelationKind">
+        <option value="child_attribute">Hijo por atributo</option>
+        <option value="contains">Contiene</option>
+        <option value="contained">Contenido en</option>
+        <option value="father_substance">Padre por sustancia</option>
+        <option value="father_attribute">Padre por atributo</option>
+        <option value="opposed">Opuesto</option>
+        <option value="associated">Asociado</option>
+        <option value="crossed">Cruzado</option>
+        <option value="twin">Gemelo</option>
+      </select>
+    </label>
+  </div>
+  <button type="button" id="databaseRelationsBtn">Consultar relaciones</button>
+  <p id="databaseRelationStatus" class="ieml-help" role="status"></p>
+  <div id="databaseRelationResults" class="chips"></div>
+  <details><summary>Relaciones JSON</summary><pre id="databaseRelationJSON"></pre></details>
+
+  <h3>Tablas y jerarquía</h3>
+  <div class="canonical-controls">
+    <label for="databaseTableTerm">Script de la tabla
+      <input type="text" id="databaseTableTerm" value="O:O:." maxlength="2048">
+    </label>
+  </div>
+  <button type="button" id="databaseTableBtn">Consultar tabla</button>
+  <p id="databaseTableStatus" class="ieml-help" role="status"></p>
+  <div class="ieml-table"><table aria-label="Celdas de tabla IEML">
+    <tbody id="databaseTableRows"></tbody>
+  </table></div>
+  <details><summary>Tabla JSON</summary><pre id="databaseTableJSON"></pre></details>
+</section>
 </main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
 <script>
 "use strict";
@@ -239,4 +312,4 @@ document.getElementById("iemlAlign").addEventListener("click",async()=>{
   document.getElementById("naturalJSON").textContent=JSON.stringify(data,null,2);
  }catch(err){status.textContent="No fue posible alinear: "+err.message+". Comprueba el backend local.";}
 });
-</script><script type="module" src="./src/ieml/ui.js"></script><script type="module" src="./src/ieml/canonical-ui.js"></script><script type="module" src="./src/ieml/upstream-ui.js"></script></body></html>
+</script><script type="module" src="./src/ieml/ui.js"></script><script type="module" src="./src/ieml/canonical-ui.js"></script><script type="module" src="./src/ieml/upstream-ui.js"></script><script type="module" src="./src/ieml/database-ui.js"></script></body></html>
