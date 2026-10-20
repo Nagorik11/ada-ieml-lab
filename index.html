@@ -3,7 +3,7 @@
 <title>ADA · IEML Semiotic Lab</title>
 <style>
 :root{font-family:system-ui,Arial;color:#edf3ff;background:#0b1321}*{box-sizing:border-box}body{margin:0}header,footer{padding:24px 5%;background:#101e32}h1{margin:0}small,.muted{color:#a5bad6}main{max-width:1200px;margin:auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:#14243b;border:1px solid #304763;padding:20px;border-radius:14px}.wide{grid-column:1/-1}textarea{width:100%;min-height:105px;padding:12px;background:#091626;color:#fff;border:1px solid #526d89;border-radius:8px;font:inherit}button{border:0;border-radius:8px;padding:11px 14px;background:#60ddba;color:#09231e;font-weight:bold;cursor:pointer;margin:6px 5px 0 0}button.alt{background:#334c67;color:white}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#091626;padding:12px;border-radius:9px}.stat strong{display:block;font-size:23px;color:#60ddba}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.chip{border:1px solid #55708c;border-radius:20px;padding:5px 9px;font-size:12px}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #304763;padding:9px;text-align:left;font-size:13px}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#091626;padding:12px}svg{width:100%;height:210px;background:#091626;border-radius:10px}footer{text-align:center;color:#a5bad6}@media(max-width:750px){main{grid-template-columns:1fr}}
-.ieml-help{color:#a5bad6;font-size:13px;line-height:1.5}.ieml-table{overflow-x:auto}.ieml-table th{color:#b8d8ef}.alpha-cell{min-width:48px;margin:0;background:#203d54;color:#c9f6ee}.alpha-cell[aria-pressed="true"]{background:#60ddba;color:#09231e;outline:2px solid #edf3ff}.ieml-doc{border:1px solid #304763;padding:12px 14px;border-radius:10px;margin-top:10px}.ieml-doc h3{margin:0 0 8px}.ieml-doc p{font-size:14px;line-height:1.6}.ieml-field{background:#091626;color:white;border:1px solid #526d89;border-radius:8px;padding:10px;max-width:100%;width:100%;font:inherit}#alphabetSelected{font-size:19px;color:#60ddba;font-weight:700}#alphaComparison{display:block;margin-top:8px}pre{max-height:420px;overflow:auto}</style></head><body>
+.ieml-help{color:#a5bad6;font-size:13px;line-height:1.5}.ieml-table{overflow-x:auto}.ieml-table th{color:#b8d8ef}.alpha-cell{min-width:48px;margin:0;background:#203d54;color:#c9f6ee}.alpha-cell[aria-pressed="true"]{background:#60ddba;color:#09231e;outline:2px solid #edf3ff}.ieml-doc{border:1px solid #304763;padding:12px 14px;border-radius:10px;margin-top:10px}.ieml-doc h3{margin:0 0 8px}.ieml-doc p{font-size:14px;line-height:1.6}.ieml-field{background:#091626;color:white;border:1px solid #526d89;border-radius:8px;padding:10px;max-width:100%;width:100%;font:inherit}#alphabetSelected{font-size:19px;color:#60ddba;font-weight:700}#alphaComparison{display:block;margin-top:8px}pre{max-height:420px;overflow:auto}.canonical-controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0}.canonical-controls label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:#abc6de}.canonical-controls select,.canonical-controls input{background:#091626;color:#fff;border:1px solid #526d89;padding:8px;border-radius:8px;max-width:180px}.canonical-projection{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}.canonical-choice{background:#091626;border:1px solid #304763;border-radius:8px;padding:9px;font-size:13px;display:flex;gap:6px;align-items:center}.canonical-number{font-variant-numeric:tabular-nums;text-align:right}.canonical-bar-track{width:100%;min-width:70px;height:11px;background:#091626;border-radius:9px;overflow:hidden}.canonical-bar-fill{display:block;height:100%;background:#60ddba}.canonical-sentence th{background:#0c1b2b;color:#d9f5ef}.canonical-result{padding:10px;border:1px solid #304763;border-radius:10px;margin:8px 0;overflow-wrap:anywhere}.canonical-result p{margin:5px 0;font-size:14px}@media(max-width:600px){.canonical-projection{grid-template-columns:repeat(2,minmax(0,1fr))}}</style></head><body>
 <header><h1>◈ ADA / IEML Semiotic Lab</h1><small>Gramática · Semiótica · Roles actanciales · Familias de glifos · JSON</small></header>
 <main>
 <section class="panel"><h2>01 / Expresión</h2><textarea id="expression">clear → mind → avoid → restraint → refresh → body → begin</textarea><div><button id="analyze">Analizar</button><button class="alt" id="example">Ejemplo</button><button class="alt" id="export">Exportar JSON</button></div><p class="muted">Admite flechas, comas, &gt; y espacios.</p><div class="chips" id="chips"></div></section>
@@ -51,6 +51,32 @@
  <button id="referenceSearchBtn" type="button">Buscar en diccionario</button>
  <p id="referenceStatus" class="ieml-help" aria-live="polite">Consulta disponible con el backend local.</p>
  <div class="ieml-table"><table><thead><tr><th>Término IEML</th><th>Descriptores</th><th>Tipo</th></tr></thead><tbody id="referenceRows"></tbody></table></div>
+</section>
+
+<section class="panel wide" id="canonicalPanel">
+ <h2>11 / Asignación de bases canónicas · ℝ⁹</h2>
+ <p class="ieml-help">Proyección estructural de texto sobre una base ortonormal e0…e8. Basado en el documento «Formal Algebraic Representation of the IEML Semantic Space». Los coeficientes son presencia (0/1) o puntuaciones heurísticas; <strong>no son códigos IEML formales</strong>.</p>
+ <p class="ieml-help">Texto de entrada: se utiliza la oración ingresada en la sección 07.</p>
+ <div class="canonical-controls">
+  <label for="canonicalMode">Coeficiente
+   <select id="canonicalMode"><option value="presence">Presencia (0/1)</option><option value="confidence">Confianza heurística</option></select>
+  </label>
+  <label for="canonicalAccent">Acento semántico
+   <select id="canonicalAccent"><option value="">Sin acento</option><option value="0">e0 · Raíz</option><option value="1">e1 · Iniciador</option><option value="2">e2 · Interactante</option><option value="3">e3 · Destinatario</option><option value="4">e4 · Causalidad</option><option value="5">e5 · Tiempo</option><option value="6">e6 · Lugar</option><option value="7">e7 · Intención</option><option value="8">e8 · Manera</option></select>
+  </label>
+  <label for="canonicalScale">Escala del acento
+   <input id="canonicalScale" type="number" min="0" max="10" step="0.1" value="1.5">
+  </label>
+ </div>
+ <p class="ieml-help">Subespacio de proyección (selecciona bases; por defecto las nueve):</p>
+ <div id="canonicalProjection" class="canonical-projection"></div>
+ <div><button type="button" id="canonicalRun">Asignar bases al texto</button><button class="alt" type="button" id="canonicalExport">Exportar vector JSON</button></div>
+ <p class="ieml-help" id="canonicalStatus" role="status">Inicia el backend Python local para calcular vectores desde spaCy.</p>
+ <div class="ieml-table"><table aria-label="Coeficientes estructurales por base canónica">
+  <thead><tr><th>Base</th><th>Rol</th><th>Evidencia</th><th>cᵢ</th><th>Magnitud</th></tr></thead>
+  <tbody id="canonicalRows"></tbody></table></div>
+ <div id="canonicalVectors"></div>
+ <details><summary>Resultado completo y trazabilidad JSON</summary><pre id="canonicalJSON"></pre></details>
 </section>
 </main><footer>ADA · Laboratorio experimental · Ejecución local</footer>
 <script>
@@ -188,4 +214,4 @@ document.getElementById("iemlAlign").addEventListener("click",async()=>{
   document.getElementById("naturalJSON").textContent=JSON.stringify(data,null,2);
  }catch(err){status.textContent="No fue posible alinear: "+err.message+". Comprueba el backend local.";}
 });
-</script><script type="module" src="./src/ieml/ui.js"></script></body></html>
+</script><script type="module" src="./src/ieml/ui.js"></script><script type="module" src="./src/ieml/canonical-ui.js"></script></body></html>
