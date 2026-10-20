@@ -97,3 +97,33 @@ La sección **14 / LatticeStructure** integra el código de jerarquías IEML apo
 **No debe confundirse con una retícula algebraica completa**: solo construye relaciones jerárquicas dirigidas y contención. No verifica operaciones matemáticas de supremo/ínfimo ni sustituye a las bases `e0…e8` del modelo R9.
 
 Ver [documentación de jerarquías y retículas](docs/LATTICE_STRUCTURE.md).
+
+## Gramática IEML: lexer original y árbol de scripts (v0.8)
+
+Analizados e incorporados mediante adaptadores los siete archivos Python
+`lexer.py`, `parser.py`, `dictionary.py`, `script.py`, `operator.py`,
+`tools.py` y `relations.py` proporcionados en la conversación.
+
+Sus hashes Git coinciden exactamente con la revisión
+`b49d70bc8a9a548bf6a1066eef8cb975cbf95c91` de
+`IEMLdev/ieml` (GPL-3.0). **No se copiaron archivos externos al repositorio.**
+
+- **Sección 15:** tokenización de las primitivas y símbolos con tipos, líneas y
+  columnas. Los caracteres desconocidos producen errores explícitos.
+- **`GET /api/upstream/script/lex`:** escáner estricto sin dependencias externas.
+- **`POST /api/upstream/script/inspect`:** inspección de AST, capa,
+  cardinalidad y operandos usando el parser original instalado opcionalmente.
+- **`backend/script_inspector.py`:** implementación léxica independiente y
+  adaptador AST acotado.
+- **`tools/verify_upstream_sources.py`:** verificación por SHA-256 y SHA-1 Git.
+- **`backend/test_script_inspector.py`:** pruebas de 6 primitivas, 25 símbolos,
+  7 niveles y distinción entre validez léxica y sintáctica.
+- **`backend/upstream_database.py`:** consulta opcional de relaciones
+  `identity`, `table_0`…`table_5`, además de los tipos anteriores.
+
+Consultar [análisis y guía de integración](docs/GRAMMAR_SOURCE_INTEGRATION.md)
+y el [manifiesto de integridad](docs/UPSTREAM_SOURCE_MANIFEST.json).
+
+El parser PLY de 2021 y `RelationsGraph` utilizan dependencias antiguas;
+la ejecución completa contra la biblioteca original en Python actual sigue
+pendiente de validación. La tokenización de ADA funciona sin ellas.
