@@ -26,6 +26,8 @@ jobs:
           grep -q 'src/ieml/upstream-ui.js' index.html
           grep -q 'id="databasePanel"' index.html
           grep -q 'src/ieml/database-ui.js' index.html
+          grep -q 'id="latticePanel"' index.html
+          grep -q 'src/ieml/lattice-ui.js' index.html
       - name: Check all inline JavaScript blocks
         run: |
           node --input-type=commonjs - <<'NODE'
@@ -44,4 +46,4 @@ jobs:
       - name: Compile all Python backend modules
         run: python -m compileall -q backend
       - name: Run Python reference, alignment, canonical and database tests
-        run: python -m unittest backend.test_reference backend.test_ieml_bridge backend.test_canonical_space backend.test_upstream_ieml backend.test_upstream_database -v
+        run: python -m unittest backend.test_reference backend.test_ieml_bridge backend.test_canonical_space backend.test_upstream_ieml backend.test_upstream_database backend.test_lattice -v
