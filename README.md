@@ -69,3 +69,17 @@ python -m unittest backend.test_upstream_ieml -v
 ```
 
 La biblioteca upstream es antigua (commit del 8 de marzo de 2021) y su ejecución con Python moderno sigue pendiente de prueba de integración real. **No se han copiado archivos con licencia GPL-3.0 al repositorio**, pero el uso y distribución combinados requieren revisar las obligaciones de esa licencia. Consultar [auditoría técnica y guía de integración](docs/UPSTREAM_IEML.md).
+
+## IEMLDatabase · Notebook histórico (nuevo)
+
+La sección **13 / IEMLDatabase** añade exploración de términos USL, traducciones EN/FR, relaciones y tablas a partir de las APIs documentadas en `IEMLDatabase.ipynb` (archivo proporcionado). Funciona en **modo lectura** contra una copia local opcional del repositorio `IEMLdev/ieml-language`; **no usa llaves SSH ni actualiza el repositorio**.
+
+```bash
+git clone --depth 1 https://github.com/IEMLdev/ieml-language.git ./data/upstream-ieml-language
+export IEML_DATABASE_PATH="$(pwd)/data/upstream-ieml-language"
+# Instalar y comprobar por separado la biblioteca Python GPL-3.0 opcional:
+pip install -r backend/requirements-upstream-ieml.txt
+uvicorn backend.main:app --host 127.0.0.1 --port 8001
+```
+
+La compatibilidad del parser original con Python moderno no está certificada: las pruebas CI son de contrato, sin instalar la biblioteca antigua. Ver [auditoría e instrucciones](docs/IEML_DATABASE_NOTEBOOK.md).
