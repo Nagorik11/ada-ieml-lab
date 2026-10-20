@@ -127,3 +127,20 @@ y el [manifiesto de integridad](docs/UPSTREAM_SOURCE_MANIFEST.json).
 El parser PLY de 2021 y `RelationsGraph` utilizan dependencias antiguas;
 la ejecución completa contra la biblioteca original en Python actual sigue
 pendiente de validación. La tokenización de ADA funciona sin ellas.
+
+### Operadores IEML locales (suma, multiplicación, promoción, factorización)
+
+El nuevo `backend/operator_bridge.py` expone los operadores del upstream
+**solo por CLI local**, después de instalar la dependencia opcional.
+No se copian ni se modifican los archivos originales.
+
+```bash
+python -m backend.operator_bridge add U: A:
+python -m backend.operator_bridge multiply U: A: S:
+python -m backend.operator_bridge promote U: --target-layer 2
+# Factorizar, opt-in bajo responsabilidad del operador:
+python -m backend.operator_bridge factorize 'U:+A:' --enable-factorize
+```
+
+La factorización es combinatoria y no se expone a través de HTTP.
+Los controles de entrada no sustituyen aislamiento por tiempo y memoria.
