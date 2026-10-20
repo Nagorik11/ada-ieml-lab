@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from backend.ieml_bridge import align_roles
 from backend.canonical_space import assign_roles as canonical_assign_roles, assign_analysis as canonical_assign_analysis
 from backend.lattice import LatticeStructure
+from backend.script_inspector import lex_script, inspect_script
 from backend.upstream_database import (
     DatabaseUnavailable, DatabaseQueryError,
     database_status as upstream_database_status,
@@ -54,6 +55,10 @@ class LatticeEdgesRequest(BaseModel):
 
 class LatticeReferenceRequest(BaseModel):
     terms: list[str] = Field(min_length=1, max_length=300)
+
+
+class ScriptInspectRequest(BaseModel):
+    expression: str = Field(min_length=1, max_length=2048)
 
 
 class UpstreamParseRequest(BaseModel):
@@ -319,4 +324,29 @@ def build_lattice_from_reference(request: LatticeReferenceRequest):
     except FileNotFoundError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except (ValueError, TypeError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+@app.get("/api/upstream/script/lex")
+def lexicalize_upstream_script(expression: str):
+    """Strict lexical analysis based on the supplied historical lexer.py.
+
+    This endpoint does not require installing IEMLdev/ieml. It does not
+    claim that lexically valid expressions satisfy grammar rules.
+    """
+    try:
+        return lex_script(expression)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/upstream/script/inspect")
+def inspect_upstream_script(request: ScriptInspectRequest):
+    """Parse real historical IEML script AST through optional upstream package."""
+    try:
+        return inspect_script(request.expression)
+    except UpstreamUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except UpstreamInvalid as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
