@@ -22,16 +22,28 @@ def normalize(value: str) -> str:
                    if unicodedata.category(c) != "Mn").strip()
 
 def validate_usl(expression: str) -> dict[str, Any]:
-    """Optional legacy parser validation; never treat a failure as success."""
+    """Use actual IEMLdev/ieml implementation instead of stale README imports.
+
+    Output is a syntactic validation, NOT dictionary-semantic certification.
+    """
+    from backend.upstream_ieml import (
+        UpstreamInvalid, UpstreamUnavailable, parse_expression,
+    )
+
     try:
-        from ieml.grammar import usl
-    except (ImportError, Exception) as exc:
+        result = parse_expression(expression, kind="usl")
+    except UpstreamUnavailable as exc:
         return {"valid": None, "status": "parser_unavailable", "detail": str(exc)}
-    try:
-        parsed = usl(expression)
-        return {"valid": True, "status": "parsed", "canonical": str(parsed)}
-    except Exception as exc:
+    except (UpstreamInvalid, ValueError) as exc:
         return {"valid": False, "status": "invalid", "detail": str(exc)}
+    return {
+        "valid": True, "status": "parsed",
+        "canonical": result["canonical"],
+        "engine": result["engine"],
+        "dictionaryVerified": False,
+        "sourceCommit": result["sourceCommit"],
+    }
+
 
 def align_roles(analysis: dict[str, Any], lexicon: dict[str, Any] | None = None,
                 validate: bool = False) -> dict[str, Any]:
