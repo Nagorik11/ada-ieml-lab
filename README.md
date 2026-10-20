@@ -83,3 +83,17 @@ uvicorn backend.main:app --host 127.0.0.1 --port 8001
 ```
 
 La compatibilidad del parser original con Python moderno no está certificada: las pruebas CI son de contrato, sin instalar la biblioteca antigua. Ver [auditoría e instrucciones](docs/IEML_DATABASE_NOTEBOOK.md).
+
+## LatticeStructure · Jerarquía y contención (v0.7)
+
+La sección **14 / LatticeStructure** integra el código de jerarquías IEML aportado. Identifica `parents`, `child`, `contains` y `contained_by` y presenta un grafo SVG junto a una tabla bidireccional. Puede consumir el conjunto de relaciones IEML v0.4 ya importado, o relaciones explícitas suministradas en JSON.
+
+- `backend/lattice.py`: núcleo Python sin importaciones del IEML antiguo; conserva el algoritmo de `ancestors` y `singular_sequences` para objetos compatibles.
+- `POST /api/lattice/reference`: subgrafo por términos reales del diccionario importado.
+- `POST /api/lattice/edges`: grafo tipado para pruebas y estructuras suministradas.
+- `backend/test_lattice.py`: validaciones de inversas, raíces, dirección de aristas, ciclos e índices.
+- `python -m unittest backend.test_lattice -v`: ejecutar las pruebas.
+
+**No debe confundirse con una retícula algebraica completa**: solo construye relaciones jerárquicas dirigidas y contención. No verifica operaciones matemáticas de supremo/ínfimo ni sustituye a las bases `e0…e8` del modelo R9.
+
+Ver [documentación de jerarquías y retículas](docs/LATTICE_STRUCTURE.md).
