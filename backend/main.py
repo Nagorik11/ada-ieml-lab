@@ -3,17 +3,18 @@
 These are candidate mappings into eight analytical slots, not certified IEML encodings.
 """
 from __future__ import annotations
-from typing import Any
-from fastapi import FastAPI
+from typing import Any, Literal
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.ieml_bridge import align_roles
+from backend.canonical_space import assign_roles as canonical_assign_roles, assign_analysis as canonical_assign_analysis
 from backend.reference import lookup as reference_lookup, search as reference_search, neighbors as reference_neighbors
 import spacy
 
 MODEL = "es_core_news_sm"
 nlp = spacy.load(MODEL)
-app = FastAPI(title="ADA IEML NLP", version="0.2.0")
+app = FastAPI(title="ADA IEML NLP", version="0.3.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:8000", "http://127.0.0.1:8000"], allow_methods=["POST", "GET"], allow_headers=["*"])
 ROLES = {
     0: "Raíz", 1: "Iniciador", 2: "Interactante", 3: "Destinatario",
@@ -31,6 +32,22 @@ class AlignmentRequest(BaseModel):
 
 class Request(BaseModel):
     text: str = Field(min_length=1, max_length=15000)
+
+
+class CanonicalTextRequest(Request):
+    mode: Literal["presence", "confidence"] = "presence"
+    accent_role: int | None = Field(default=None, ge=0, le=8)
+    accent_scale: float = Field(default=1.5, ge=0, le=10)
+    projection_roles: list[int] | None = None
+
+
+class CanonicalRolesRequest(BaseModel):
+    roles: dict[str, dict[str, Any]] | list[dict[str, Any]]
+    mode: Literal["presence", "confidence", "manual"] = "presence"
+    manual_coefficients: dict[str, float] | None = None
+    accent_role: int | None = Field(default=None, ge=0, le=8)
+    accent_scale: float = Field(default=1.5, ge=0, le=10)
+    projection_roles: list[int] | None = None
 
 def phrase(token):
     subtree = sorted(token.subtree, key=lambda t: t.i)
@@ -98,7 +115,42 @@ def health():
 
 @app.post("/api/analyze")
 def analyze(request: Request):
-    return extract(request.text)
+    """Return candidate roles and their explicit canonical basis assignment."""
+    analysis = extract(request.text)
+    for sentence in analysis["sentences"]:
+        sentence["canonical"] = canonical_assign_roles(sentence["roles"], mode="presence")
+    return analysis
+
+
+@app.post("/api/canonical")
+def analyze_canonical(request: CanonicalTextRequest):
+    """Project extracted sentence roles onto the R9 canonical basis."""
+    try:
+        return canonical_assign_analysis(
+            extract(request.text),
+            mode=request.mode,
+            accent_role=request.accent_role,
+            accent_scale=request.accent_scale,
+            projection_roles=request.projection_roles,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post("/api/canonical/roles")
+def canonical_from_roles(request: CanonicalRolesRequest):
+    """Direct canonical assignment for reviewed/edited role evidence."""
+    try:
+        return canonical_assign_roles(
+            request.roles,
+            mode=request.mode,
+            manual_coefficients=request.manual_coefficients,
+            accent_role=request.accent_role,
+            accent_scale=request.accent_scale,
+            projection_roles=request.projection_roles,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 @app.post("/api/align")
 def align(request: AlignmentRequest):
