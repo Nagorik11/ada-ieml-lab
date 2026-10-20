@@ -151,3 +151,29 @@ verificación SHA y validación de sintaxis del código están en GitHub Actions
 en un entorno Python moderno**; la evaluación de integración real es un
 trabajo separado. La redistribución del upstream o distribución conjunta
 requiere evaluar cumplimiento GPL-3.0 y conservar avisos de licencia.
+
+## Operaciones originales en entorno local
+
+Se añadió `backend/operator_bridge.py` para reutilizar los nombres y contratos
+de `operator.py` y `tools.py` a través de la instalación upstream opcional.
+No expone estas operaciones a una API HTTP pública.
+
+```bash
+# Requiere el paquete IEMLdev/ieml instalado en un entorno compatible.
+python -m backend.operator_bridge add U: A:
+python -m backend.operator_bridge multiply U: A: S:
+python -m backend.operator_bridge promote U: --target-layer 2
+# Ejecución combinatoria: solo para entradas pequeñas y de confianza.
+python -m backend.operator_bridge factorize 'U:+A:' --enable-factorize
+```
+
+Los argumentos y resultados utilizan `Script` real: `add`, `m`,
+`promote` y `factorize`. La interfaz rechaza caracteres inválidos;
+limita cada entrada a 128 caracteres, tres scripts y cardinalidad máxima 128.
+La factorización exige permiso explícito y cardinalidad no superior a 16.
+Estas cotas **no garantizan** un límite de tiempo/CPU; no ejecutar esta CLI
+como servicio accesible al público sin sandbox adicional.
+
+Los tests de `backend/test_operator_bridge.py` ejercitan la lógica y los
+bloqueos con simulaciones. Falta ejecutar operaciones con el parser antiguo
+instalado para certificar que es compatible con el Python desplegado.
